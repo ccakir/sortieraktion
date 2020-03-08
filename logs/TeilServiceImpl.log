@@ -1,0 +1,4 @@
+06 Mär 2020 20:48:53,166 {AWT-EventQueue-0} ERROR com.cakir.serviceImpl.TeilServiceImpl  - Field 'id' doesn't have a default value
+06 Mär 2020 21:41:21,892 {AWT-EventQueue-0} ERROR com.cakir.serviceImpl.KundeServiceImpl  - Cannot delete or update a parent row: a foreign key constraint fails (`sortieraktion`.`teil`, CONSTRAINT `kunde` FOREIGN KEY (`kunde_id`) REFERENCES `kunde` (`id`))
+06 Mär 2020 21:45:38,995 {AWT-EventQueue-0} ERROR com.cakir.serviceImpl.KundeServiceImpl  - Cannot delete or update a parent row: a foreign key constraint fails (`sortieraktion`.`teil`, CONSTRAINT `kunde` FOREIGN KEY (`kunde_id`) REFERENCES `kunde` (`id`))
+06 Mär 2020 21:53:56,278 {AWT-EventQueue-0} ERROR com.cakir.serviceImpl.KundeServiceImpl  - Cannot delete or update a parent row: a foreign key constraint fails (`sortieraktion`.`teil`, CONSTRAINT `kunde` FOREIGN KEY (`kunde_id`) REFERENCES `kunde` (`id`))

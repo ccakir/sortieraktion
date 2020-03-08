@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration PUBLIC
+  "-//APACHE//DTD LOG4J 1.2//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+
+<log4j:configuration
+	xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	
+
+	<appender name="MyConsole"
+		class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%-4r [%t] %-5p %c %x - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="DatabaseConnectionAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/databaseConnection.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="HomeAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/homeFrame.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="BreakpointServiceImplAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/BreakpointServiceImpl.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="MitarbeiterServiceImplAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/MitarbeiterServiceImpl.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="KundeServiceImplAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/KundeServiceImpl.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="KontaktServiceImplAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/KontaktServiceImpl.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="DetailsServiceImplAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/DetailsServiceImpl.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="TeilServiceImplAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/TeilServiceImpl.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="SortieraktionServiceImplAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/SortieraktionServiceImpl.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
+
+	<logger name="com.cakir.mysqlConnection">
+		<level value="INFO"/>
+		<appender-ref ref="DatabaseConnectionAppender"/>
+	</logger>
+	
+	<logger name="com.cakir.gui">
+		<level value="INFO"/>
+		<appender-ref ref="HomeAppender"/>
+	</logger>
+	
+	<logger name="com.cakir.serviceImpl">
+		<level value="INFO"/>
+		<appender-ref ref="BreakpointServiceImplAppender"/>
+	</logger>
+	
+	<logger name="com.cakir.serviceImpl">
+		<level value="INFO"/>
+		<appender-ref ref="MitarbeiterServiceImplAppender"/>
+	</logger>
+	
+	<logger name="com.cakir.serviceImpl">
+		<level value="INFO"/>
+		<appender-ref ref="KundeServiceImplAppender"/>
+	</logger>
+	
+	<logger name="com.cakir.serviceImpl">
+		<level value="INFO"/>
+		<appender-ref ref="KontaktServiceImplAppender"/>
+	</logger>
+	
+	<logger name="com.cakir.serviceImpl">
+		<level value="INFO"/>
+		<appender-ref ref="DetailsServiceImplAppender"/>
+	</logger>
+	
+	<logger name="com.cakir.serviceImpl">
+		<level value="INFO"/>
+		<appender-ref ref="TeilServiceImplAppender"/>
+	</logger>
+	
+	<logger name="com.cakir.serviceImpl">
+		<level value="INFO"/>
+		<appender-ref ref="SortieraktionServiceImplAppender"/>
+	</logger>
+	
+	
+	<root>
+		<priority value="debug" />
+		<appender-ref ref="MyConsole" />
+	</root>
+
+</log4j:configuration>
