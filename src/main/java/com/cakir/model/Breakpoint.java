@@ -2,7 +2,7 @@ package com.cakir.model;
 
 public class Breakpoint {
 	
-	private long id;
+	private String id;
 	private boolean erste;
 	private boolean zweite;
 	private boolean dritte;
@@ -22,10 +22,10 @@ public class Breakpoint {
 	}
 
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public boolean isErste() {
@@ -49,12 +49,12 @@ public class Breakpoint {
 	
 	public static class BreakpointBuilder {
 		
-		private long id;
+		private String id;
 		private boolean erste;
 		private boolean zweite;
 		private boolean dritte;
 		
-		public BreakpointBuilder id(long id) {
+		public BreakpointBuilder id(String id) {
 			this.id = id;
 			return this;
 		}

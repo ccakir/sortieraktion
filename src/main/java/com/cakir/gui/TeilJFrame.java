@@ -181,6 +181,7 @@ public class TeilJFrame extends JFrame {
 							lblId.setVisible(false);
 							tfId.setText(null);
 							tfId.setVisible(false);
+							dispose();
 						} else {
 							JOptionPane.showMessageDialog(null, "Teil wurde nicht aktualisiert.\n Ein Fehler ist aufgetreten", "FEHLER", JOptionPane.ERROR_MESSAGE);
 							

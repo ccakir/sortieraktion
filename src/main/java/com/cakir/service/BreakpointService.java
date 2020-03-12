@@ -12,9 +12,9 @@ public interface BreakpointService {
 	
 	boolean update(Breakpoint breakpoint);
 	
-	boolean delete(long id);
+	boolean delete(String id);
 	
-	Breakpoint findById(long id);
+	Breakpoint findById(String id);
 	
 
 }

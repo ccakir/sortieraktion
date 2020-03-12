@@ -29,14 +29,17 @@ public class BreakpointServiceImpl implements BreakpointService {
 
 		try {
 			conn = DatabaseConnection.getMySQLConnection();
-			Statement stmt = conn.createStatement();
+			PreparedStatement prStatement = conn.prepareStatement("INSERT INTO breakpoint (id, erste, zweite, dritte) VALUES (?, ?, ?, ?)");
 
-			int result = stmt.executeUpdate("INSERT INTO breakpoint (erste, zweite, dritte) VALUES ('"
-					+ breakpoint.isErste() + "', '" + breakpoint.isZweite() + "', '" + breakpoint.isDritte() + "')");
-			if (result == 1)
+			prStatement.setString(1, breakpoint.getId());
+			prStatement.setBoolean(2, breakpoint.isErste());
+			prStatement.setBoolean(3, breakpoint.isZweite());
+			prStatement.setBoolean(4, breakpoint.isDritte());
+			
+			prStatement.execute();
+			
 				return true;
-			else
-				return false;
+			
 
 		} catch (SQLException e) {
 			logger.debug(e.getMessage());
@@ -63,7 +66,7 @@ public class BreakpointServiceImpl implements BreakpointService {
 			prStatement.setBoolean(1, breakpoint.isErste());
 			prStatement.setBoolean(2, breakpoint.isZweite());
 			prStatement.setBoolean(3, breakpoint.isDritte());
-			prStatement.setLong(4, breakpoint.getId());
+			prStatement.setString(4, breakpoint.getId());
 			int result = prStatement.executeUpdate();
 			
 			if(result == 1) return true;
@@ -86,7 +89,7 @@ public class BreakpointServiceImpl implements BreakpointService {
 	}
 
 	@Override
-	public boolean delete(long id) {
+	public boolean delete(String id) {
 		
 		try {
 			conn = DatabaseConnection.getMySQLConnection();
@@ -119,7 +122,7 @@ public class BreakpointServiceImpl implements BreakpointService {
 	}
 
 	@Override
-	public Breakpoint findById(long id) {
+	public Breakpoint findById(String id) {
 		
 		try {
 			conn = DatabaseConnection.getMySQLConnection();
@@ -130,6 +133,7 @@ public class BreakpointServiceImpl implements BreakpointService {
 			if(rs.next()) {
 				
 				Breakpoint bp = new Breakpoint.BreakpointBuilder()
+						.id(rs.getString("id"))
 						.erste(rs.getBoolean("erste"))
 						.zweite(rs.getBoolean("zweite"))
 						.dritte(rs.getBoolean("dritte"))
@@ -168,6 +172,7 @@ public class BreakpointServiceImpl implements BreakpointService {
 			while(rs.next()) {
 				
 				Breakpoint bp = new Breakpoint.BreakpointBuilder()
+						.id(rs.getString("id"))
 						.erste(rs.getBoolean("erste"))
 						.zweite(rs.getBoolean("zweite"))
 						.dritte(rs.getBoolean("dritte"))

@@ -9,8 +9,8 @@ public interface DetailsService {
 	
 	boolean update(Details details);
 	
-	boolean delete(long id);
+	boolean delete(String id);
 	
-	Details findById(long id);
+	Details findById(String id);
 
 }

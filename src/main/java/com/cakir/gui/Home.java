@@ -1,11 +1,13 @@
 package com.cakir.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -13,29 +15,35 @@ import javax.swing.border.EmptyBorder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.cakir.config.ButtonEditor;
+import com.cakir.config.ButtonRenderer;
+import com.cakir.model.Breakpoint;
 import com.cakir.model.Kontakt;
 import com.cakir.model.Kunde;
 import com.cakir.model.Mitarbeiter;
 import com.cakir.model.Sortieraktion;
 import com.cakir.model.Teil;
+import com.cakir.serviceImpl.BreakpointServiceImpl;
 import com.cakir.serviceImpl.KontaktServiceImpl;
 import com.cakir.serviceImpl.KundeServiceImpl;
 import com.cakir.serviceImpl.MitarbeiterServiceImpl;
 import com.cakir.serviceImpl.SortieraktionServiceImpl;
 import com.cakir.serviceImpl.TeilServiceImpl;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JTabbedPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
-import javax.swing.text.TabExpander;
-
 import java.awt.SystemColor;
 import javax.swing.ListSelectionModel;
 
@@ -51,12 +59,17 @@ public class Home extends JFrame {
 	KontaktServiceImpl kontaktService = new KontaktServiceImpl();
 	TeilServiceImpl teilService = new TeilServiceImpl();
 	SortieraktionServiceImpl aktionService = new SortieraktionServiceImpl();
+	BreakpointServiceImpl bpService = new BreakpointServiceImpl();
 	
 	private JTable tableKontakt;
 	private JTable tableTeil;
 	private JTable tableAlleSortieraktionen;
 
-	/**
+	private int pageSize = 1500;
+	private int tabSize = pageSize - 36;
+	private int scrolPaneSize = pageSize - 61;
+	private int tableSize = scrolPaneSize - 11;
+;	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
@@ -79,14 +92,14 @@ public class Home extends JFrame {
 	public Home() {
 		setTitle("SORTIERAKTIONEN");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1200, 1000);
+		setBounds(100, 100, 1500, 1000);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(10, 179, 1164, 635);
+		tabbedPane.setBounds(10, 179, tabSize, 635);
 		tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		tabbedPane.setBorder(null);
 		contentPane.add(tabbedPane);
@@ -96,7 +109,7 @@ public class Home extends JFrame {
 		tabAlleSortieraktionen.setLayout(null);
 
 		JScrollPane jScrollPane_Suspekt = new JScrollPane();
-		jScrollPane_Suspekt.setBounds(10, 11, 1139, 589);
+		jScrollPane_Suspekt.setBounds(10, 11, scrolPaneSize, 589);
 		tabAlleSortieraktionen.add(jScrollPane_Suspekt);
 		
 		tableAlleSortieraktionen = new JTable();
@@ -104,12 +117,15 @@ public class Home extends JFrame {
 			new Object[][] {
 			},
 			new String[] {
-				"", "", "Datum", "Kunde", "Teil", "Grund", "Mitarbeiter", "Freigabe", "Breakpoint","Offen", "Ansicht"
-			}
+				"", "ID", "Datum", "Kunde", "Teil", "Grund", "Mitarbeiter", "Freigabe", "Breakpoint","Offen", "Ansicht"
+			} 
 		));
+		
+		getTableList("sortieraktion", tableAlleSortieraktionen);
+		
 		jScrollPane_Suspekt.setViewportView(tableAlleSortieraktionen);
 
-		setJTableColumnsWidth(tableAlleSortieraktionen, 1139, 0, 2, 5, 20, 10, 20, 10, 7, 10, 7, 9);
+		setJTableColumnsWidth(tableAlleSortieraktionen, tableSize, 0, 7, 8, 12, 10, 20, 10, 7, 10, 7, 9);
 		tableAnsicht(tableAlleSortieraktionen, 0);
 		JPanel tabOffeneSortieraktionen = new JPanel();
 		tabbedPane.addTab("offene Sortieraktionen", null, tabOffeneSortieraktionen, null);
@@ -117,8 +133,6 @@ public class Home extends JFrame {
 
 		JScrollPane jScrollPane_NA = new JScrollPane();
 		jScrollPane_NA.setBounds(10, 11, 1150, 589);
-		// jScrollPane_NA.setViewportView(tableNacharbeit);
-		// getAlleZettel("NACHARBEIT", tableNacharbeit);
 		tabOffeneSortieraktionen.add(jScrollPane_NA);
 
 		tableMitarbeiter = new JTable();
@@ -133,8 +147,8 @@ public class Home extends JFrame {
 		tabMitarbeiter.setLayout(null);
 
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(10, 11, 1139, 589);
-		setJTableColumnsWidth(tableMitarbeiter, 1139, 10, 20, 20, 30, 20, 0);
+		scrollPane_1.setBounds(10, 11, scrolPaneSize, 589);
+		setJTableColumnsWidth(tableMitarbeiter, tableSize, 10, 20, 20, 30, 20, 0);
 		scrollPane_1.setViewportView(tableMitarbeiter);
 		tabMitarbeiter.add(scrollPane_1);
 		getTableList("mitarbeiter", tableMitarbeiter);
@@ -144,9 +158,7 @@ public class Home extends JFrame {
 		tabTeile.setLayout(null);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 11, 1150, 589);
-		// scrollPane.setViewportView(tableMA);
-		// getAlleZettel("MATERIALAUSSCHUSS", tableMA);
+		scrollPane.setBounds(10, 11, scrolPaneSize, 589);
 		tabTeile.add(scrollPane);
 		
 		tableTeil = new JTable();
@@ -157,7 +169,7 @@ public class Home extends JFrame {
 				"", "Teilename", "Teilenummer", "Kunde", ""
 			}
 		));
-		setJTableColumnsWidth(tableTeil, 1139, 5, 25, 25, 50, 0);
+		setJTableColumnsWidth(tableTeil, tableSize, 5, 25, 25, 50, 0);
 		tableAnsicht(tableTeil, 4);
 		scrollPane.setViewportView(tableTeil);
 		getTableList("teil", tableTeil);
@@ -167,7 +179,7 @@ public class Home extends JFrame {
 		tableKunde.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableKunde.setModel(new DefaultTableModel(new Object[][] {},
 				new String[] { "", "Name", "Adresse", "Plz", "Stadt", "Land", "Uidnummer", "" }));
-		setJTableColumnsWidth(tableKunde, 1139, 5, 25, 25, 10, 12, 13, 10, 0);
+		setJTableColumnsWidth(tableKunde, tableSize, 5, 25, 25, 10, 12, 13, 10, 0);
 		tableAnsicht(tableKunde, 7);
 		
 		
@@ -177,7 +189,7 @@ public class Home extends JFrame {
 		tabKunde.setLayout(null);
 		
 		JScrollPane scPane_Kunde = new JScrollPane();
-		scPane_Kunde.setBounds(10, 11, 1139, 589);
+		scPane_Kunde.setBounds(10, 11, scrolPaneSize, 589);
 		scPane_Kunde.setViewportView(tableKunde);
 		tabKunde.add(scPane_Kunde);
 		getTableList("kunde", tableKunde);
@@ -187,7 +199,7 @@ public class Home extends JFrame {
 		tabKontakt.setLayout(null);
 		
 		JScrollPane scrollPane_2 = new JScrollPane();
-		scrollPane_2.setBounds(10, 11, 1139, 589);
+		scrollPane_2.setBounds(10, 11, scrolPaneSize, 589);
 		tabKontakt.add(scrollPane_2);
 		
 		tableKontakt = new JTable();
@@ -198,38 +210,46 @@ public class Home extends JFrame {
 				"", "Vorname", "Nachname", "Telefon", "Fax", "Email", ""
 			}
 		));
-		setJTableColumnsWidth(tableKontakt, 1139, 6, 20, 20, 17, 17, 25, 0);
+		setJTableColumnsWidth(tableKontakt, tableSize, 6, 20, 20, 17, 17, 20, 0);
 		tableAnsicht(tableKontakt, 6);
 		scrollPane_2.setViewportView(tableKontakt);
 		getTableList("kontakt", tableKontakt);
+		
+		
 		JPanel panel = new JPanel();
-		panel.setBounds(10, 11, 882, 79);
+		panel.setBounds(10, 63, 1202, 61);
 		contentPane.add(panel);
 		panel.setLayout(null);
 
 		JButton btnMitarbeiter = new JButton("MITARBEITER");
 
 		btnMitarbeiter.setBackground(SystemColor.inactiveCaption);
-		btnMitarbeiter.setBounds(10, 11, 176, 23);
+		btnMitarbeiter.setBounds(10, 27, 176, 23);
 		panel.add(btnMitarbeiter);
 		
 		JButton btnKunde = new JButton("KUNDE");
 		
 		btnKunde.setBackground(SystemColor.inactiveCaption);
-		btnKunde.setBounds(208, 11, 176, 23);
+		btnKunde.setBounds(208, 27, 176, 23);
 		panel.add(btnKunde);
 		
 		JButton btnKontakt = new JButton("KONTAKT");
 		
 		btnKontakt.setBackground(SystemColor.inactiveCaption);
-		btnKontakt.setBounds(410, 11, 176, 23);
+		btnKontakt.setBounds(410, 27, 176, 23);
 		panel.add(btnKontakt);
 		
 		JButton btnTeil = new JButton("TEIL");
 		
 		btnTeil.setBackground(SystemColor.inactiveCaption);
-		btnTeil.setBounds(611, 11, 176, 23);
+		btnTeil.setBounds(611, 27, 176, 23);
 		panel.add(btnTeil);
+		
+		JButton btnAktion = new JButton("SORTIERAKTION");
+		
+		btnAktion.setBackground(SystemColor.inactiveCaption);
+		btnAktion.setBounds(815, 27, 176, 23);
+		panel.add(btnAktion);
 
 		JButton btnAktualisieren = new JButton("TABELLE AKTUALISIEREN");
 
@@ -274,7 +294,7 @@ public class Home extends JFrame {
 					switch (tabbedPane.getSelectedIndex()) {
 					case 0:
 
-						Sortieraktion sortieraktion = aktionService.findById((long) activeTable.getModel().getValueAt(activeTable.getSelectedRow(), 0));
+						Sortieraktion sortieraktion = aktionService.findById((String) activeTable.getModel().getValueAt(activeTable.getSelectedRow(), 1));
 						boolean result_0 = aktionService.delete(sortieraktion);
 
 						if (result_0) {
@@ -289,7 +309,7 @@ public class Home extends JFrame {
 						
 					case 1:
 
-						Sortieraktion sortieraktionOffen = aktionService.findById((long) activeTable.getModel().getValueAt(activeTable.getSelectedRow(), 0));
+						Sortieraktion sortieraktionOffen = aktionService.findById((String) activeTable.getModel().getValueAt(activeTable.getSelectedRow(), 1));
 						boolean result_1 = aktionService.delete(sortieraktionOffen);
 
 						if (result_1) {
@@ -383,6 +403,17 @@ public class Home extends JFrame {
 				} else {
 
 					switch (tabbedPane.getSelectedIndex()) {
+					case 0:
+
+						Sortieraktion updateAktion = aktionService
+								.findById((String) activeTable.getModel().getValueAt(activeTable.getSelectedRow(), 1));
+						SortieraktionJFrame aFrame = new SortieraktionJFrame();
+						aFrame.setLocationRelativeTo(null);
+						aFrame.updateFelder(updateAktion);
+						aFrame.setVisible(true);
+
+						break;
+						
 					case 2:
 
 						Mitarbeiter updateMitarbeiter = mitarbeiterService
@@ -440,7 +471,7 @@ public class Home extends JFrame {
 
 				switch (tabbedPane.getSelectedIndex()) {
 				case 0:
-					getTableList("sortieraktionen", tableAlleSortieraktionen);
+					getTableList("sortieraktion", tableAlleSortieraktionen);
 					break;
 
 				case 1:
@@ -469,6 +500,14 @@ public class Home extends JFrame {
 			}
 		});
 
+		btnAktion.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SortieraktionJFrame sFrame = new SortieraktionJFrame();
+				sFrame.setLocationRelativeTo(null);
+				sFrame.setVisible(true);
+			}
+		});
+		
 		btnKontakt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				KontaktJFrame kontaktFrame = new KontaktJFrame();
@@ -536,13 +575,31 @@ public class Home extends JFrame {
 		case "sortieraktion":
 
 			List<Sortieraktion> listAktion = aktionService.alleSortieraktionen();
+			
+			
+			tableAlleSortieraktionen.getColumn("Ansicht").setCellRenderer(new ButtonRenderer());
+			tableAlleSortieraktionen.getColumn("Ansicht").setCellEditor(new ButtonEditor(new JCheckBox()));
 
 			if (listAktion != null) {
 				for (Sortieraktion aktion : listAktion) {
+					
+					Breakpoint bp = bpService.findById(aktion.getId());
 
-					model.addRow(new Object[] { aktion.getId(), no, aktion.getDatum(), aktion.getKunde().getName(), aktion.getTeil().getTeilename()+" - "+aktion.getTeil().getTeilenummer(),
-							aktion.getGrund(), aktion.getMitarbeiter().getVorname()+" "+aktion.getMitarbeiter().getNachname(), aktion.isFreigabe(),
-							aktion.getBreakpoint().isErste()+"/"+aktion.getBreakpoint().isZweite()+"/"+aktion.getBreakpoint().isDritte(), aktion.isOffen(), "Ansicht"});
+					String bpStatus1 = "X", bpStatus2 = "X", bpStatus3 = "X", freigabe = "JA", status = "OFFEN";
+					
+					if(bp.isErste()) bpStatus1 = "O";
+					if(bp.isZweite()) bpStatus2 = "O";
+					if(bp.isDritte()) bpStatus3 = "O";
+					
+					if(!aktion.isFreigabe()) freigabe = "NEIN";
+					
+					if(!aktion.isOffen()) status = "GESCHLOSSEN";
+					
+					
+					
+					model.addRow(new Object[] { no, aktion.getId(), aktion.getDatum(), aktion.getKunde().getName(), aktion.getTeil().getTeilename()+" - "+aktion.getTeil().getTeilenummer(),
+							aktion.getGrund(), aktion.getMitarbeiter().getVorname()+" "+aktion.getMitarbeiter().getNachname(), freigabe,
+							bpStatus1+" - "+bpStatus2+" - "+bpStatus3, status, aktion.getId()});
 					no++;
 				}
 			}
@@ -636,3 +693,18 @@ public class Home extends JFrame {
 		table.removeColumn(table.getColumnModel().getColumn(removeColumn));
 	}
 }
+class ImageRendererOK extends DefaultTableCellRenderer {
+	  JLabel lbl = new JLabel();
+
+	  ImageIcon icon = new ImageIcon(getClass().getResource("/./images/ok1.png"));
+
+	  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+	      boolean hasFocus, int row, int column) {
+	    lbl.setText((String) value);
+	    lbl.setIcon(icon);
+	    return lbl;
+	  }
+	}
+
+
+

@@ -29,15 +29,15 @@ public class DetailsServiceImpl implements DetailsService {
 		try {
 			conn = DatabaseConnection.getMySQLConnection();
 			PreparedStatement preparedStatement = conn.prepareStatement(
-					"INSET INTO details (beginn, anzahlStueck, anzahlStunde, bisDatum, bisLieferung, bisWiderruf)"
-							+ " VALUES (?, ?, ?, ?, ?, ?)");
+					"INSERT INTO details (id, beginn, anzahlStueck, anzahlStunde, bisDatum, bisLieferung, bisWiderruf) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
-			preparedStatement.setString(1, details.getBeginn());
-			preparedStatement.setString(2, details.getAnzahlStueck());
-			preparedStatement.setString(3, details.getAnzahlStunde());
-			preparedStatement.setString(4, details.getBisDatum());
-			preparedStatement.setString(5, details.getBisLieferung());
-			preparedStatement.setString(6, details.getBisWiderruf());
+			preparedStatement.setString(1, details.getId());
+			preparedStatement.setString(2, details.getBeginn());
+			preparedStatement.setString(3, details.getAnzahlStueck());
+			preparedStatement.setString(4, details.getAnzahlStunde());
+			preparedStatement.setString(5, details.getBisDatum());
+			preparedStatement.setString(6, details.getBisLieferung());
+			preparedStatement.setString(7, details.getBisWiderruf());
 
 			preparedStatement.execute();
 			return true;
@@ -71,7 +71,7 @@ public class DetailsServiceImpl implements DetailsService {
 			pStatement.setString(4, details.getBisDatum());
 			pStatement.setString(5, details.getBisLieferung());
 			pStatement.setString(6, details.getBisWiderruf());
-			pStatement.setLong(7, details.getId());
+			pStatement.setString(7, details.getId());
 
 			if (pStatement.executeUpdate() == 1)
 				return true;
@@ -94,7 +94,7 @@ public class DetailsServiceImpl implements DetailsService {
 	}
 
 	@Override
-	public boolean delete(long id) {
+	public boolean delete(String id) {
 		try {
 			conn = DatabaseConnection.getMySQLConnection();
 			Statement stmt = conn.createStatement();
@@ -128,7 +128,7 @@ public class DetailsServiceImpl implements DetailsService {
 	}
 
 	@Override
-	public Details findById(long id) {
+	public Details findById(String id) {
 		try {
 			conn = DatabaseConnection.getMySQLConnection();
 			Statement stmt = conn.createStatement();
@@ -137,6 +137,7 @@ public class DetailsServiceImpl implements DetailsService {
 			
 			if(rs.next()) {
 				Details details = new Details.DetailsBuilder()
+						.id(rs.getString("id"))
 						.beginn(rs.getString("beginn"))
 						.anzahlStueck(rs.getString("anzahlStueck"))
 						.anzahlStunde(rs.getString("anzahlStunde"))

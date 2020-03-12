@@ -13,8 +13,8 @@ public class Sortieraktion {
 	private Details details;
 	private String grund;
 	private String anweisung;
-	private BigDecimal stundensatzNormal;
-	private BigDecimal stundesatzRE;
+	private String stundensatzNormal;
+	private String stundesatzRE;
 	private String zusatzkosten;
 	private boolean teileReturn;
 	private Mitarbeiter mitarbeiter;
@@ -104,16 +104,16 @@ public class Sortieraktion {
 	public void setAnweisung(String anweisung) {
 		this.anweisung = anweisung;
 	}
-	public BigDecimal getStundensatzNormal() {
+	public String getStundensatzNormal() {
 		return stundensatzNormal;
 	}
-	public void setStundensatzNormal(BigDecimal stundensatzNormal) {
+	public void setStundensatzNormal(String stundensatzNormal) {
 		this.stundensatzNormal = stundensatzNormal;
 	}
-	public BigDecimal getStundesatzRE() {
+	public String getStundesatzRE() {
 		return stundesatzRE;
 	}
-	public void setStundesatzRE(BigDecimal stundesatzRE) {
+	public void setStundesatzRE(String stundesatzRE) {
 		this.stundesatzRE = stundesatzRE;
 	}
 	public String getZusatzkosten() {
@@ -164,8 +164,8 @@ public class Sortieraktion {
 		private Details details;
 		private String grund;
 		private String anweisung;
-		private BigDecimal stundensatzNormal;
-		private BigDecimal stundesatzRE;
+		private String stundensatzNormal;
+		private String stundesatzRE;
 		private String zusatzkosten;
 		private boolean teileReturn;
 		private Mitarbeiter mitarbeiter;
@@ -209,11 +209,11 @@ public class Sortieraktion {
 			this.anweisung = anweisung;
 			return this;
 		}
-		public SortieraktionBuilder stundensatzNormal(BigDecimal stundensatzNormal) {
+		public SortieraktionBuilder stundensatzNormal(String stundensatzNormal) {
 			this.stundensatzNormal = stundensatzNormal;
 			return this;
 		}
-		public SortieraktionBuilder stundesatzRE(BigDecimal stundesatzRE) {
+		public SortieraktionBuilder stundesatzRE(String stundesatzRE) {
 			this.stundesatzRE = stundesatzRE;
 			return this;
 		}

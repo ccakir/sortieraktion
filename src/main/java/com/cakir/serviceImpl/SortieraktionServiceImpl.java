@@ -54,17 +54,17 @@ public class SortieraktionServiceImpl implements SortieraktionService {
 				Kunde kunde = kundeService.findById(rs.getLong("kunde_id"));
 				Kontakt kontakt = kontaktService.findById(rs.getLong("kontakt_id"));
 				Teil teil = teilService.findById(rs.getLong("teil_id"));
-				Details details = detailsService.findById(rs.getLong("details_id"));
+				Details details = detailsService.findById(rs.getString("id"));
 				Mitarbeiter mitarbeiter = mitarbeiterService.findById(rs.getLong("mitarbeiter_id"));
-				Breakpoint breakpoint = breakpointService.findById(rs.getLong("breakpoint_id"));
+				Breakpoint breakpoint = breakpointService.findById(rs.getString("id"));
 
 				Sortieraktion aktion = new Sortieraktion.SortieraktionBuilder()
 						.id(rs.getString("id"))
 						.datum(rs.getString("datum"))
 						.kunde(kunde).dunsnummer(rs.getString("dunsnummer")).kontaktPerson(kontakt).teil(teil)
 						.details(details).grund(rs.getString("grund")).anweisung(rs.getString("anweisung"))
-						.stundensatzNormal(rs.getBigDecimal("stundensatzNormal"))
-						.stundesatzRE(rs.getBigDecimal("stundensatzRE")).zusatzkosten(rs.getString("zusatzkosten"))
+						.stundensatzNormal(rs.getString("stundensatzNormal"))
+						.stundesatzRE(rs.getString("stundensatzRE")).zusatzkosten(rs.getString("zusatzkosten"))
 						.teileReturn(rs.getBoolean("teileReturn")).mitarbeiter(mitarbeiter)
 						.offen(rs.getBoolean("offen")).freigabe(rs.getBoolean("freigabe")).breakpoint(breakpoint)
 						.build();
@@ -91,36 +91,68 @@ public class SortieraktionServiceImpl implements SortieraktionService {
 	}
 
 	@Override
-	public boolean speichern(Sortieraktion aktion) {
+	public boolean speichern(Sortieraktion aktion, Breakpoint breakpoint, Details details) {
 
 		try {
 			conn = DatabaseConnection.getMySQLConnection();
+			conn.setAutoCommit(false);
 			PreparedStatement preparedStatement = conn.prepareStatement(
-					"INSERT INTO aktion (datum, kunde_id, dunsnummer, kontakt_id, teil_id, details_id, grund, anweisung, stundensatzNormal, stundesatzRE, zusatzkosten, teileReturn, mitarbeiter_id, offen, freigabe, bereakpoint_id)"
-							+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					"INSERT INTO aktion (datum, kunde_id, dunsnummer, kontakt_id, teil_id, grund, anweisung, stundensatzNormal, stundensatzRE, zusatzkosten, teileReturn, mitarbeiter_id, offen, freigabe, id)"
+							+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 			preparedStatement.setString(1, aktion.getDatum());
 			preparedStatement.setLong(2, aktion.getKunde().getId());
 			preparedStatement.setString(3, aktion.getDunsnummer());
 			preparedStatement.setLong(4, aktion.getKontaktPerson().getId());
 			preparedStatement.setLong(5, aktion.getTeil().getId());
-			preparedStatement.setLong(6, aktion.getDetails().getId());
-			preparedStatement.setString(7, aktion.getGrund());
-			preparedStatement.setString(8, aktion.getAnweisung());
-			preparedStatement.setBigDecimal(9, aktion.getStundensatzNormal());
-			preparedStatement.setBigDecimal(10, aktion.getStundesatzRE());
-			preparedStatement.setString(11, aktion.getZusatzkosten());
-			preparedStatement.setBoolean(12, aktion.isTeileReturn());
-			preparedStatement.setLong(13, aktion.getMitarbeiter().getId());
-			preparedStatement.setBoolean(14, aktion.isOffen());
-			preparedStatement.setBoolean(15, aktion.isFreigabe());
-			preparedStatement.setLong(16, aktion.getBreakpoint().getId());
+			preparedStatement.setString(6, aktion.getGrund());
+			preparedStatement.setString(7, aktion.getAnweisung());
+			preparedStatement.setString(8, aktion.getStundensatzNormal());
+			preparedStatement.setString(9, aktion.getStundesatzRE());
+			preparedStatement.setString(10, aktion.getZusatzkosten());
+			preparedStatement.setBoolean(11, aktion.isTeileReturn());
+			preparedStatement.setLong(12, aktion.getMitarbeiter().getId());
+			preparedStatement.setBoolean(13, aktion.isOffen());
+			preparedStatement.setBoolean(14, aktion.isFreigabe());
+			preparedStatement.setString(15, aktion.getId());
 			preparedStatement.execute();
+			
+			
+			
+			PreparedStatement pStatement = conn.prepareStatement(
+					"INSERT INTO details (id, beginn, anzahlStueck, anzahlStunde, bisDatum, bisLieferung, bisWiderruf) VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+			pStatement.setString(1, details.getId());
+			pStatement.setString(2, details.getBeginn());
+			pStatement.setString(3, details.getAnzahlStueck());
+			pStatement.setString(4, details.getAnzahlStunde());
+			pStatement.setString(5, details.getBisDatum());
+			pStatement.setString(6, details.getBisLieferung());
+			pStatement.setString(7, details.getBisWiderruf());
+
+			pStatement.execute();
+			
+			PreparedStatement prStatement = conn.prepareStatement("INSERT INTO breakpoint (id, erste, zweite, dritte) VALUES (?, ?, ?, ?)");
+
+			prStatement.setString(1, breakpoint.getId());
+			prStatement.setBoolean(2, breakpoint.isErste());
+			prStatement.setBoolean(3, breakpoint.isZweite());
+			prStatement.setBoolean(4, breakpoint.isDritte());
+			
+			prStatement.execute();
+			
+			conn.commit();
 			return true;
 
 		} catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
+			try{
+				 if(conn!=null)
+		            conn.rollback();
+		      }catch(SQLException se2){
+		         se2.printStackTrace();
+		      }
 			return false;
 		} finally {
 			if (conn != null) {
@@ -135,44 +167,72 @@ public class SortieraktionServiceImpl implements SortieraktionService {
 	}
 
 	@Override
-	public boolean update(Sortieraktion aktion) {
+	public boolean update(Sortieraktion aktion, Breakpoint bp, Details details) {
 
 		Kunde kunde = kundeService.findById(aktion.getKunde().getId());
 		Kontakt kontakt = kontaktService.findById(aktion.getKontaktPerson().getId());
 		Teil teil = teilService.findById(aktion.getTeil().getId());
-		Details details = detailsService.findById(aktion.getDetails().getId());
+		
 		Mitarbeiter mitarbeiter = mitarbeiterService.findById(aktion.getMitarbeiter().getId());
-		Breakpoint breakpoint = breakpointService.findById(aktion.getBreakpoint().getId());
+		
 		
 		try {
 			conn = DatabaseConnection.getMySQLConnection();
+			conn.setAutoCommit(false);
 			PreparedStatement preparedStatement = conn.prepareStatement(
-					"UPDATE SET aktion datum=?, kunde_id=?, dunsnummer=?, kontakt_id=?, teil_id=?, details_id=?, grund=?, anweisung=?, stundensatzNormal=?, stundesatzRE=?, zusatzkosten=?, teileReturn=?, mitarbeiter_id=?, offen=? freigabe=?, bereakpoint_id=? WHERE id=?");
+					"UPDATE aktion SET datum=?, kunde_id=?, dunsnummer=?, kontakt_id=?, teil_id=?, grund=?, anweisung=?, stundensatzNormal=?, stundensatzRE=?, zusatzkosten=?, teileReturn=?, mitarbeiter_id=?, offen=?, freigabe=? WHERE id=?");
 
 			preparedStatement.setString(1, aktion.getDatum());
 			preparedStatement.setLong(2, kunde.getId());
 			preparedStatement.setString(3, aktion.getDunsnummer());
 			preparedStatement.setLong(4, kontakt.getId());
 			preparedStatement.setLong(5, teil.getId());
-			preparedStatement.setLong(6, details.getId());
-			preparedStatement.setString(7, aktion.getGrund());
-			preparedStatement.setString(8, aktion.getAnweisung());
-			preparedStatement.setBigDecimal(9, aktion.getStundensatzNormal());
-			preparedStatement.setBigDecimal(10, aktion.getStundesatzRE());
-			preparedStatement.setString(11, aktion.getZusatzkosten());
-			preparedStatement.setBoolean(12, aktion.isTeileReturn());
-			preparedStatement.setLong(13, mitarbeiter.getId());
-			preparedStatement.setBoolean(14, aktion.isOffen());
-			preparedStatement.setBoolean(15, aktion.isFreigabe());
-			preparedStatement.setLong(16, breakpoint.getId());
-			preparedStatement.setString(17, aktion.getId());
+			preparedStatement.setString(6, aktion.getGrund());
+			preparedStatement.setString(7, aktion.getAnweisung());
+			preparedStatement.setString(8, aktion.getStundensatzNormal());
+			preparedStatement.setString(9, aktion.getStundesatzRE());
+			preparedStatement.setString(10, aktion.getZusatzkosten());
+			preparedStatement.setBoolean(11, aktion.isTeileReturn());
+			preparedStatement.setLong(12, mitarbeiter.getId());
+			preparedStatement.setBoolean(13, aktion.isOffen());
+			preparedStatement.setBoolean(14, aktion.isFreigabe());
+			preparedStatement.setString(15, aktion.getId());
 			
-			if(preparedStatement.executeUpdate() == 1)	return true;
-			else return false;
+			preparedStatement.executeUpdate();
+			
+			PreparedStatement prStatement = conn.prepareStatement("UPDATE breakpoint SET erste=?, zweite=?, dritte=? WHERE id=?");
+			prStatement.setBoolean(1, bp.isErste());
+			prStatement.setBoolean(2, bp.isZweite());
+			prStatement.setBoolean(3, bp.isDritte());
+			prStatement.setString(4, aktion.getId());
+			prStatement.executeUpdate();
+			
+			
+			PreparedStatement pStatement = conn.prepareStatement(
+					"UPDATE details SET beginn=?, anzahlStueck=?, anzahlStunde=?, bisDatum=?, bisLieferung=?, bisWiderruf=? WHERE id=?");
+
+			pStatement.setString(1, details.getBeginn());
+			pStatement.setString(2, details.getAnzahlStueck());
+			pStatement.setString(3, details.getAnzahlStunde());
+			pStatement.setString(4, details.getBisDatum());
+			pStatement.setString(5, details.getBisLieferung());
+			pStatement.setString(6, details.getBisWiderruf());
+			pStatement.setString(7, aktion.getId());
+
+			pStatement.executeUpdate();
+			
+			conn.commit();
+			return true;
 
 		} catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
+			try{
+				 if(conn!=null)
+		            conn.rollback();
+		      }catch(SQLException se2){
+		         se2.printStackTrace();
+		      }
 			return false;
 		} finally {
 			if (conn != null) {
@@ -190,29 +250,40 @@ public class SortieraktionServiceImpl implements SortieraktionService {
 	public boolean delete(Sortieraktion aktion) {
 		try {
 			conn = DatabaseConnection.getMySQLConnection();
+			conn.setAutoCommit(false);
+			
 			Statement stmt = conn.createStatement();
+			stmt.executeUpdate("DELETE FROM aktion WHERE id='"+aktion.getId()+"'");
 			
-			int result = stmt.executeUpdate("DELETE FROM aktion WHERE id='"+aktion.getId()+"'");
+			Statement stmt1 = conn.createStatement();
+			stmt1.executeUpdate("DELETE FROM breakpoint WHERE id='"+aktion.getId()+"'");
 			
-			if(result == 1 ) {
-				
-				detailsService.delete(aktion.getDetails().getId());
-				breakpointService.delete(aktion.getBreakpoint().getId());
-				return true;
-			}
-			else {
-				return false;
-			}
+			Statement stmt2 = conn.createStatement();
+			stmt2.executeUpdate("DELETE FROM details WHERE id='"+aktion.getId()+"'");
 			
+			conn.commit();
+			return true;
 					
 		} catch (SQLIntegrityConstraintViolationException e) {
 			logger.error(e.getMessage());
 			JOptionPane.showMessageDialog(null, "Diese Daten können Sie nicht löschen.\nDiese Daten werden in einer anderen Tabelle verwendet.", "FEHLER", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			try{
+				 if(conn!=null)
+		            conn.rollback();
+		      }catch(SQLException se2){
+		         se2.printStackTrace();
+		      }
 			return false;
 		}  catch (SQLException e) {
 			logger.error(e.getMessage());
 			e.printStackTrace();
+			try{
+				 if(conn!=null)
+		            conn.rollback();
+		      }catch(SQLException se2){
+		         se2.printStackTrace();
+		      }
 			return false;
 		}
 		finally {
@@ -228,7 +299,7 @@ public class SortieraktionServiceImpl implements SortieraktionService {
 	}
 
 	@Override
-	public Sortieraktion findById(long id) {
+	public Sortieraktion findById(String id) {
 		try {
 			conn = DatabaseConnection.getMySQLConnection();
 			Statement stmt = conn.createStatement();
@@ -240,15 +311,15 @@ public class SortieraktionServiceImpl implements SortieraktionService {
 				Kunde kunde = kundeService.findById(rs.getLong("kunde_id"));
 				Kontakt kontakt = kontaktService.findById(rs.getLong("kontakt_id"));
 				Teil teil = teilService.findById(rs.getLong("teil_id"));
-				Details details = detailsService.findById(rs.getLong("details_id"));
+				Details details = detailsService.findById(rs.getString("id"));
 				Mitarbeiter mitarbeiter = mitarbeiterService.findById(rs.getLong("mitarbeiter_id"));
-				Breakpoint breakpoint = breakpointService.findById(rs.getLong("breakpoint_id"));
+				Breakpoint breakpoint = breakpointService.findById(rs.getString("id"));
 
 				Sortieraktion aktion = new Sortieraktion.SortieraktionBuilder().id(rs.getString("id")).datum(rs.getString("datum"))
 						.kunde(kunde).dunsnummer(rs.getString("dunsnummer")).kontaktPerson(kontakt).teil(teil)
 						.details(details).grund(rs.getString("grund")).anweisung(rs.getString("anweisung"))
-						.stundensatzNormal(rs.getBigDecimal("stundensatzNormal"))
-						.stundesatzRE(rs.getBigDecimal("stundensatzRE")).zusatzkosten(rs.getString("zusatzkosten"))
+						.stundensatzNormal(rs.getString("stundensatzNormal"))
+						.stundesatzRE(rs.getString("stundensatzRE")).zusatzkosten(rs.getString("zusatzkosten"))
 						.teileReturn(rs.getBoolean("teileReturn")).mitarbeiter(mitarbeiter)
 						.offen(rs.getBoolean("offen")).freigabe(rs.getBoolean("freigabe")).breakpoint(breakpoint)
 						.build();
@@ -293,17 +364,17 @@ public class SortieraktionServiceImpl implements SortieraktionService {
 				Kunde kunde = kundeService.findById(rs.getLong("kunde_id"));
 				Kontakt kontakt = kontaktService.findById(rs.getLong("kontakt_id"));
 				Teil teil = teilService.findById(rs.getLong("teil_id"));
-				Details details = detailsService.findById(rs.getLong("details_id"));
+				Details details = detailsService.findById(rs.getString("id"));
 				Mitarbeiter mitarbeiter = mitarbeiterService.findById(rs.getLong("mitarbeiter_id"));
-				Breakpoint breakpoint = breakpointService.findById(rs.getLong("breakpoint_id"));
+				Breakpoint breakpoint = breakpointService.findById(rs.getString("id"));
 
 				Sortieraktion aktion = new Sortieraktion.SortieraktionBuilder()
 						.id(rs.getString("id"))
 						.datum(rs.getString("datum"))
 						.kunde(kunde).dunsnummer(rs.getString("dunsnummer")).kontaktPerson(kontakt).teil(teil)
 						.details(details).grund(rs.getString("grund")).anweisung(rs.getString("anweisung"))
-						.stundensatzNormal(rs.getBigDecimal("stundensatzNormal"))
-						.stundesatzRE(rs.getBigDecimal("stundensatzRE")).zusatzkosten(rs.getString("zusatzkosten"))
+						.stundensatzNormal(rs.getString("stundensatzNormal"))
+						.stundesatzRE(rs.getString("stundensatzRE")).zusatzkosten(rs.getString("zusatzkosten"))
 						.teileReturn(rs.getBoolean("teileReturn")).mitarbeiter(mitarbeiter)
 						.offen(rs.getBoolean("offen")).freigabe(rs.getBoolean("freigabe")).breakpoint(breakpoint)
 						.build();
