@@ -79,6 +79,20 @@
 		</layout>
 	</appender>
 	
+	<appender name="StundenServiceImplAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/StundenServiceImpl.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="StundenDetailsServiceImplAppender" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/StundenDetailsServiceImpl.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} {%t} %-5p %c %x - %m%n"/>
+		</layout>
+	</appender>
+	
 
 	<logger name="com.cakir.mysqlConnection">
 		<level value="INFO"/>
@@ -123,6 +137,16 @@
 	<logger name="com.cakir.serviceImpl">
 		<level value="INFO"/>
 		<appender-ref ref="SortieraktionServiceImplAppender"/>
+	</logger>
+	
+	<logger name="com.cakir.serviceImpl">
+		<level value="INFO"/>
+		<appender-ref ref="StundenServiceImplAppender"/>
+	</logger>
+	
+	<logger name="com.cakir.serviceImpl">
+		<level value="INFO"/>
+		<appender-ref ref="StundenDetailsServiceImplAppender"/>
 	</logger>
 	
 	

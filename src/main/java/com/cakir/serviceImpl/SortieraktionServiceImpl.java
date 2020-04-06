@@ -357,7 +357,7 @@ public class SortieraktionServiceImpl implements SortieraktionService {
 			conn = DatabaseConnection.getMySQLConnection();
 			Statement stmt = conn.createStatement();
 
-			ResultSet rs = stmt.executeQuery("SELECT * FROM aktion WHERE offen='"+0+"' ORDER BY id DESC");
+			ResultSet rs = stmt.executeQuery("SELECT * FROM aktion WHERE offen='"+1+"' ORDER BY id DESC");
 
 			while (rs.next()) {
 

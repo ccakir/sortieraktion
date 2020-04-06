@@ -105,3 +105,7 @@
 09 Mär 2020 21:22:15,099 {AWT-EventQueue-0} ERROR com.cakir.serviceImpl.SortieraktionServiceImpl  - Can't call commit when autocommit=true
 09 Mär 2020 22:23:03,850 {AWT-EventQueue-0} INFO  com.cakir.serviceImpl.SortieraktionServiceImpl  - No Sortieraktion entry with id : 
 09 Mär 2020 22:23:51,464 {AWT-EventQueue-0} INFO  com.cakir.serviceImpl.SortieraktionServiceImpl  - No Sortieraktion entry with id : AS0347
+12 Mär 2020 20:30:58,057 {AWT-EventQueue-0} INFO  com.cakir.serviceImpl.SortieraktionServiceImpl  - No Sortieraktion entry with id : 
+12 Mär 2020 20:33:42,727 {AWT-EventQueue-0} INFO  com.cakir.serviceImpl.SortieraktionServiceImpl  - No Sortieraktion entry with id : 
+12 Mär 2020 20:35:00,631 {AWT-EventQueue-0} INFO  com.cakir.serviceImpl.SortieraktionServiceImpl  - No Sortieraktion entry with id : AS465
+12 Mär 2020 21:20:21,940 {AWT-EventQueue-0} INFO  com.cakir.serviceImpl.SortieraktionServiceImpl  - No Sortieraktion entry with id : 
